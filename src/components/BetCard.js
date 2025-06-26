@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './BetCard.css';
 
 export default function BetCard({ bet, eventImage }) {
   const [flipped, setFlipped] = useState(false);
