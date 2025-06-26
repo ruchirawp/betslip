@@ -1,115 +1,132 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { useState } from 'react';
+import Tesseract from 'tesseract.js';
+import UploadArea from '../components/UploadArea';
+import BetCard from '../components/BetCard';
+import parseWithOpenAI from '../utils/parseWithOpenAI';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 
 export default function Home() {
+  const [image, setImage] = useState(null);
+  const [ocrText, setOcrText] = useState('');
+  const [bets, setBets] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleParse = async () => {
+    if (!image) return;
+    setLoading(true);
+
+    const { data: { text } } = await Tesseract.recognize(image, 'eng');
+    setOcrText(text);
+
+    const parsed = await parseWithOpenAI(text);
+    setBets(parsed);
+
+    setLoading(false);
+  };
+
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/pages/index.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-blue-600 text-white p-4 shadow">
+        <div className="max-w-4xl mx-auto text-xl font-bold">
+          Bet Screenshot Parser
         </div>
+      </header>
+
+      {/* Main content */}
+      <main className="max-w-4xl mx-auto p-4">
+        <div className="bg-white rounded-lg shadow p-6">
+          <UploadArea setImage={setImage} />
+
+          {image && (
+            <>
+              <img
+                src={URL.createObjectURL(image)}
+                alt="Uploaded preview"
+                className="w-full max-w-sm mx-auto my-4 rounded shadow"
+              />
+
+              <button
+                onClick={handleParse}
+                className={`w-full py-2 rounded text-white font-semibold ${
+                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                }`}
+                disabled={loading}
+              >
+                {loading ? 'Parsing...' : 'Parse Bet'}
+              </button>
+            </>
+          )}
+        </div>
+
+        {bets.length > 0 && (
+          <div className="mt-6">
+            <Swiper
+              spaceBetween={20}
+              slidesPerView={1}
+              breakpoints={{
+                640: { slidesPerView: 1 },
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+              }}
+              className="pb-6"
+            >
+              {bets.map((bet, idx) => (
+                <SwiperSlide key={idx}>
+                  <BetCard bet={bet} eventImage={getEventImage(bet)} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        )}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer */}
+      <footer className="text-center text-xs text-gray-500 py-4">
+        © 2025 BetParser — All rights reserved
       </footer>
     </div>
   );
+}
+
+async function getEventImage(bet) {
+
+//ruchira
+console.log('getEventImage called with bet:', bet);
+
+  if (!bet || !bet.side) {
+    return 'https://via.placeholder.com/300x150?text=$';
+  }
+
+  const teamName = bet.side;
+
+  try {
+
+    //ruchira
+    console.log(`Fetching image for team: ${teamName}`);
+
+    const res = await fetch(`https://www.thesportsdb.com/api/v1/json/123/searchteams.php?t=${encodeURIComponent(teamName)}`);
+    const data = await res.json();
+
+      //ruchira
+    console.log('API response:', data);
+
+    if (data.teams && data.teams.length > 0) {
+      const team = data.teams[0];
+
+      // Prioritize fanart1 > banner > badge > logo
+      return (
+        team.strFanart1 ||
+        team.strBanner ||
+        team.strBadge ||
+        team.strLogo ||
+        'https://via.placeholder.com/300x150?text=$'
+      );
+    }
+  } catch (e) {
+    console.error('Failed to fetch team image:', e);
+  }
+
+  return 'https://via.placeholder.com/300x150?text=$';
 }
