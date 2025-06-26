@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Tesseract from 'tesseract.js';
 import UploadArea from '../components/UploadArea';
 import BetCard from '../components/BetCard';
@@ -10,6 +10,7 @@ export default function Home() {
   const [image, setImage] = useState(null);
   const [ocrText, setOcrText] = useState('');
   const [bets, setBets] = useState([]);
+  const [betImages, setBetImages] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const handleParse = async () => {
@@ -25,16 +26,30 @@ export default function Home() {
     setLoading(false);
   };
 
+  useEffect(() => {
+    async function loadImages() {
+      const results = await Promise.all(
+        bets.map(async (bet) => ({
+          bet,
+          image: await getEventImage(bet)
+        }))
+      );
+      setBetImages(results);
+    }
+
+    if (bets.length > 0) {
+      loadImages();
+    }
+  }, [bets]);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-blue-600 text-white p-4 shadow">
         <div className="max-w-4xl mx-auto text-xl font-bold">
           Bet Screenshot Parser
         </div>
       </header>
 
-      {/* Main content */}
       <main className="max-w-4xl mx-auto p-4">
         <div className="bg-white rounded-lg shadow p-6">
           <UploadArea setImage={setImage} />
@@ -44,7 +59,8 @@ export default function Home() {
               <img
                 src={URL.createObjectURL(image)}
                 alt="Uploaded preview"
-                className="w-full max-w-sm mx-auto my-4 rounded shadow"
+                className="w-48 max-w-sm mx-auto my-4 rounded shadow"
+                // className="w-full max-w-sm mx-auto my-4 rounded shadow"
               />
 
               <button
@@ -60,7 +76,7 @@ export default function Home() {
           )}
         </div>
 
-        {bets.length > 0 && (
+        {betImages.length > 0 && (
           <div className="mt-6">
             <Swiper
               spaceBetween={20}
@@ -72,9 +88,9 @@ export default function Home() {
               }}
               className="pb-6"
             >
-              {bets.map((bet, idx) => (
+              {betImages.map(({ bet, image }, idx) => (
                 <SwiperSlide key={idx}>
-                  <BetCard bet={bet} eventImage={getEventImage(bet)} />
+                  <BetCard bet={bet} eventImage={image} />
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -82,7 +98,6 @@ export default function Home() {
         )}
       </main>
 
-      {/* Footer */}
       <footer className="text-center text-xs text-gray-500 py-4">
         © 2025 BetParser — All rights reserved
       </footer>
@@ -91,42 +106,30 @@ export default function Home() {
 }
 
 async function getEventImage(bet) {
-
-//ruchira
-console.log('getEventImage called with bet:', bet);
-
   if (!bet || !bet.side) {
-    return 'https://via.placeholder.com/300x150?text=$';
+    return 'https://i.redd.it/an431wea81v41.png';
   }
 
   const teamName = bet.side;
 
   try {
-
-    //ruchira
-    console.log(`Fetching image for team: ${teamName}`);
-
     const res = await fetch(`https://www.thesportsdb.com/api/v1/json/123/searchteams.php?t=${encodeURIComponent(teamName)}`);
     const data = await res.json();
-
-      //ruchira
-    console.log('API response:', data);
 
     if (data.teams && data.teams.length > 0) {
       const team = data.teams[0];
 
-      // Prioritize fanart1 > banner > badge > logo
       return (
         team.strFanart1 ||
-        team.strBanner ||
+        team.strFanart2 ||
         team.strBadge ||
         team.strLogo ||
-        'https://via.placeholder.com/300x150?text=$'
+        'https://i.redd.it/an431wea81v41.png'
       );
     }
   } catch (e) {
     console.error('Failed to fetch team image:', e);
   }
 
-  return 'https://via.placeholder.com/300x150?text=$';
+  return 'https://i.redd.it/an431wea81v41.png';
 }

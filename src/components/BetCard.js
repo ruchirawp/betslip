@@ -5,25 +5,31 @@ export default function BetCard({ bet, eventImage }) {
   const [flipped, setFlipped] = useState(false);
 
   return (
-    <div className="flip-card cursor-pointer" onClick={() => setFlipped(!flipped)}>
-      <div className={`flip-card-inner ${flipped ? 'flipped' : ''} h-80`}> {/* Taller inner card */}
+    <div 
+      className="flip-card cursor-pointer w-64 h-96 mx-auto"
+      onClick={() => setFlipped(!flipped)}
+    >
+      <div className={`flip-card-inner ${flipped ? 'flipped' : ''} w-full h-full`}>
         
         {/* Front */}
-        <div className="flip-card-front bg-gray-100 rounded-lg shadow overflow-hidden h-80 flex flex-col">
+        <div className="flip-card-front bg-gray-100 rounded-lg shadow overflow-hidden w-full h-full flex flex-col">
           <img
             src={eventImage}
-            alt="Event"
-            className="w-full h-48 object-cover"
+            alt={bet.game || 'Event'}
+            className="w-full h-40 object-cover"
+            onError={(e) => {
+              e.target.src = '/bet_default.jpg';
+            }}
           />
-          <div className="p-2 text-center font-semibold flex-grow flex items-center justify-center">
+          <div className="p-2 text-center font-semibold flex-grow flex items-center justify-center text-sm">
             {bet.game || 'Event'}
           </div>
         </div>
 
         {/* Back */}
-        <div className="flip-card-back bg-white rounded-lg shadow p-4 h-80 overflow-auto">
-          <h3 className="font-bold text-center mb-2">{bet.game}</h3>
-          <div className="text-sm space-y-1">
+        <div className="flip-card-back bg-white rounded-lg shadow p-2 w-full h-full overflow-auto">
+          <h3 className="font-bold text-center mb-1 text-sm">{bet.game}</h3>
+          <div className="text-xs space-y-0.5">
             {Object.entries(bet).map(([key, value]) => (
               value && (
                 <p key={key}>
