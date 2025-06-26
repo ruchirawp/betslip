@@ -25,10 +25,11 @@ export default function UploadArea({ setImage }) {
 
       <label
         htmlFor="file-upload"
-        className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow mt-2"
+        className="cursor-pointer bg-[#f97315] hover:bg-orange-600 text-white px-4 py-2 rounded shadow mt-2"
       >
         Upload Image
       </label>
+
 
       <input
         id="file-upload"

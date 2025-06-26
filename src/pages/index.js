@@ -44,11 +44,17 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-blue-600 text-white p-4 shadow">
-        <div className="max-w-4xl mx-auto text-xl font-bold">
-          Bet Screenshot Parser
+      <header className="bg-[#40a0dc] text-white p-3 shadow">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <div className="text-2xl font-bold italic">
+            <span className="font-extrabold">bet</span>stamp
+          </div>
+          <nav className="space-x-6 text-sm">
+            <a href="#" className="hover:underline">Pro Tool</a>
+          </nav>
         </div>
       </header>
+
 
       <main className="max-w-4xl mx-auto p-4">
         <div className="bg-white rounded-lg shadow p-6">
@@ -63,15 +69,16 @@ export default function Home() {
                 // className="w-full max-w-sm mx-auto my-4 rounded shadow"
               />
 
-              <button
-                onClick={handleParse}
-                className={`w-full py-2 rounded text-white font-semibold ${
-                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-                }`}
-                disabled={loading}
-              >
-                {loading ? 'Parsing...' : 'Parse Bet'}
-              </button>
+            <button
+              onClick={handleParse}
+              className={`w-full py-2 rounded text-white font-semibold ${
+                loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#f97315] hover:bg-orange-600'
+              }`}
+              disabled={loading}
+            >
+              {loading ? 'Parsing...' : 'Parse Bet'}
+            </button>
+
             </>
           )}
         </div>
