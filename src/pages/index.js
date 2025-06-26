@@ -4,7 +4,9 @@ import UploadArea from '../components/UploadArea';
 import BetCard from '../components/BetCard';
 import parseWithOpenAI from '../utils/parseWithOpenAI';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
 import 'swiper/css';
+import 'swiper/css/navigation';
 
 export default function Home() {
   const [image, setImage] = useState(null);
@@ -31,7 +33,7 @@ export default function Home() {
       const results = await Promise.all(
         bets.map(async (bet) => ({
           bet,
-          image: await getEventImage(bet)
+          image: '/betlogo.png' // fallback static image
         }))
       );
       setBetImages(results);
@@ -45,16 +47,15 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-[#40a0dc] text-white p-3 shadow">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="text-2xl font-bold italic">
-            <span className="font-extrabold">bet</span>stamp
-          </div>
-          <nav className="space-x-6 text-sm">
-            <a href="#" className="hover:underline">Pro Tool</a>
-          </nav>
+        <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
+          <img
+            src="/betbanner.svg"
+            alt="Betstamp Logo"
+            className="h-10 sm:h-12 mb-2"
+          />
+          <h1 className="text-lg sm:text-xl font-semibold">Bet Screenshot Parser</h1>
         </div>
       </header>
-
 
       <main className="max-w-4xl mx-auto p-4">
         <div className="bg-white rounded-lg shadow p-6">
@@ -66,19 +67,17 @@ export default function Home() {
                 src={URL.createObjectURL(image)}
                 alt="Uploaded preview"
                 className="w-48 max-w-sm mx-auto my-4 rounded shadow"
-                // className="w-full max-w-sm mx-auto my-4 rounded shadow"
               />
 
-            <button
-              onClick={handleParse}
-              className={`w-full py-2 rounded text-white font-semibold ${
-                loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#f97315] hover:bg-orange-600'
-              }`}
-              disabled={loading}
-            >
-              {loading ? 'Parsing...' : 'Parse Bet'}
-            </button>
-
+              <button
+                onClick={handleParse}
+                className={`w-full py-2 rounded text-white font-semibold ${
+                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#f97315] hover:bg-orange-600'
+                }`}
+                disabled={loading}
+              >
+                {loading ? 'Parsing...' : 'Parse Bet'}
+              </button>
             </>
           )}
         </div>
@@ -88,6 +87,8 @@ export default function Home() {
             <Swiper
               spaceBetween={20}
               slidesPerView={1}
+              navigation={true}
+              modules={[Navigation]}
               breakpoints={{
                 640: { slidesPerView: 1 },
                 768: { slidesPerView: 2 },
@@ -104,39 +105,6 @@ export default function Home() {
           </div>
         )}
       </main>
-
-      <footer className="text-center text-xs text-gray-500 py-4">
-        © 2025 BetParser — All rights reserved
-      </footer>
     </div>
   );
-}
-
-async function getEventImage(bet) {
-  if (!bet || !bet.side) {
-    return 'https://i.redd.it/an431wea81v41.png';
-  }
-
-  const teamName = bet.side;
-
-  try {
-    const res = await fetch(`https://www.thesportsdb.com/api/v1/json/123/searchteams.php?t=${encodeURIComponent(teamName)}`);
-    const data = await res.json();
-
-    if (data.teams && data.teams.length > 0) {
-      const team = data.teams[0];
-
-      return (
-        team.strFanart1 ||
-        team.strFanart2 ||
-        team.strBadge ||
-        team.strLogo ||
-        'https://i.redd.it/an431wea81v41.png'
-      );
-    }
-  } catch (e) {
-    console.error('Failed to fetch team image:', e);
-  }
-
-  return 'https://i.redd.it/an431wea81v41.png';
 }

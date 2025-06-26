@@ -22,18 +22,20 @@ Your task:
 If a bet is a **parlay**:
 - Include type: "parlay"
 - Include legs: an array of individual legs, where each leg includes:
-  - market
+  - market type (e.g. "spread", "moneyline", "total", "player prop")
+  - prop type (if applicable)
   - side
-- Include combined_odds (e.g. "8.92")
 
 For all bets (including parlays and singles), include:
 - game (e.g. "Spain v England")
-- market (e.g. "Moneyline", "Anytime Goalscorer")
-- side (e.g. "Spain", "Dani Olmo")
+- sport (e.g. "Soccer", "Tennis")
+- Market Type (e.g., spread, moneyline, total, player prop)
+- Prop Type (if applicable)
+- side (e.g., team or player or over/under)
 - odds (e.g. "+470", "-154", "1.04")
 - stake (e.g. "$5.00")
 - payout (e.g. "$49.50")
-- status (e.g. "Finished", "Open")
+- status (e.g., won, lost, pending)
 - bet_id (e.g. "#92421933.25")
 - placed (e.g. "Jul 14, 2024 3:32PM ET")
 - other_info: include any additional useful details to fully identify the bet (such as sportsbook name, time period, or other labels found in the text)
@@ -60,7 +62,7 @@ ${ocrText}
     .trim();
 
   try {
-    console.log('OpenAI response:', cleanContent);
+    console.log('response:', cleanContent);
     return JSON.parse(cleanContent);
   } catch (e) {
     console.error('Invalid JSON from OpenAI:', cleanContent);

@@ -5,8 +5,26 @@ export default function UploadArea({ setImage }) {
     }
   };
 
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setImage(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 hover:border-blue-500 transition">
+    <div
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 hover:border-blue-500 transition"
+    >
       <svg
         className="w-12 h-12 text-gray-400 mb-2"
         fill="none"
@@ -14,7 +32,9 @@ export default function UploadArea({ setImage }) {
         strokeWidth="1.5"
         viewBox="0 0 24 24"
       >
-        <path strokeLinecap="round" strokeLinejoin="round"
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
           d="M3 15a4 4 0 014-4h10a4 4 0 014 4v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4zm16-3V7a4 4 0 00-8 0v5m4-5h.01"
         />
       </svg>
@@ -29,7 +49,6 @@ export default function UploadArea({ setImage }) {
       >
         Upload Image
       </label>
-
 
       <input
         id="file-upload"
