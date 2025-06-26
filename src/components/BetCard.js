@@ -38,7 +38,9 @@ export default function BetCard({ bet, eventImage }) {
         </div>
 
         {/* Back */}
-        <div className="flip-card-back bg-white rounded-lg shadow p-2 w-full h-full overflow-auto flex flex-col justify-between">
+        {/* <div className="flip-card-back bg-white rounded-lg shadow p-2 w-full h-full overflow-auto flex flex-col justify-between"> */}
+        <div className="flip-card-back bg-white text-black rounded-lg shadow p-2 w-full h-full overflow-auto flex flex-col justify-between">
+
           <div>
             <h2 className="font-bold text-center mb-1 text-m">{bet.game}</h2>
             <div className="text-sm space-y-0.5">
