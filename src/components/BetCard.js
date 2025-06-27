@@ -32,7 +32,7 @@ export default function BetCard({ bet, eventImage }) {
               e.target.src = '/bet_default.jpg';
             }}
           />
-          <div className="p-2 text-center font-semibold flex-grow flex items-center justify-center text-sm">
+          <div className="p-2 text-center font-semibold text-black flex-grow flex items-center justify-center text-sm">
             {bet.game || 'Event'}
           </div>
         </div>
