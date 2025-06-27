@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Tesseract from 'tesseract.js';
 import UploadArea from '../components/UploadArea';
 import BetCard from '../components/BetCard';
@@ -14,6 +14,21 @@ export default function Home() {
   const [bets, setBets] = useState([]);
   const [betImages, setBetImages] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // 👇 useMemo to manage preview URL
+  const imagePreviewUrl = useMemo(() => {
+    if (!image) return null;
+    const url = URL.createObjectURL(image);
+    return url;
+  }, [image]);
+
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
 
   const handleParse = async () => {
     if (!image) return;
@@ -63,8 +78,11 @@ export default function Home() {
 
           {image && (
             <>
+              <p className="text-sm text-red-500 text-center break-words">
+                Image URL: {imagePreviewUrl}
+              </p>
               <img
-                src={URL.createObjectURL(image)}
+                src={imagePreviewUrl}
                 alt="Uploaded preview"
                 className="w-48 max-w-sm mx-auto my-4 rounded shadow"
               />
