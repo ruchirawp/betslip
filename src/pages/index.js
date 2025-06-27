@@ -78,9 +78,6 @@ export default function Home() {
 
           {image && (
             <>
-              <p className="text-sm text-red-500 text-center break-words">
-                Image URL: {imagePreviewUrl}
-              </p>
               <img
                 src={imagePreviewUrl}
                 alt="Uploaded preview"
